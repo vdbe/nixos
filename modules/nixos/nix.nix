@@ -23,6 +23,7 @@ in
 
       settings = {
         sandbox = true;
+        trusted-users = [ "@wheel" ];
         #substituters = [
         #  # "https://cache.nixos.org/"
         #  "https://nix-community.cachix.org"
