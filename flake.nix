@@ -12,16 +12,9 @@
     # Home manager
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
-    # TODO: Add any other flake you might need
-    # hardware.url = "github:nixos/nixos-hardware";
-
-    # Shameless plug: looking for a way to nixify your themes and make
-    # everything match nicely? Try nix-colors!
-    # nix-colors.url = "github:misterio77/nix-colors";
   };
 
-  outputs = { self, nixpkgs, home-manger, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
       inherit (self) outputs;
       vars = {
@@ -41,10 +34,10 @@
       mkPkgs = system: import nixpkgs {
         inherit system;
         config.allowUnfree = true;
-        overlays = [ import ./overlays { inherit inputs; } ];
+        #overlays = import ./overlays { inherit inputs; };
       };
 
-      mkNixOsModules = name: system: [
+      mkNixOSModules = name: system: [
         {
           nixpkgs.pkgs = mkPkgs system;
           _module.args.nixpkgs = nixpkgs;
@@ -54,23 +47,23 @@
           _module.args.systemName = name;
           _module.args.vars = vars;
         }
-        home-manger.nixosModules.Home-manager
+        home-manager.nixosModules.home-manager
         {
-          home-manger = {
-            useGlobabalPkgs = true;
+          home-manager = {
+            useGlobalPkgs = true;
             useUserPackages = false;
             extraSpecialArgs = { inherit inputs nixpkgs vars; };
           };
         }
-        (./hosts + /configuration.nix)
+        (./hosts/configuration.nix)
         (./hosts + "/${name}" + /configuration.nix)
       ];
 
-      setupUpNixOs = name: system: nixpkgs.lib.nixosSystem {
+      setupNixOS = name: system: nixpkgs.lib.nixosSystem {
         inherit system;
         modules = mkNixOSModules name system;
       };
-      setUpNix = name: user: system: home-manger.lib.homeManagerConfiguration {
+      setUpNix = name: user: system: home-manager.lib.homeManagerConfiguration {
         pkgs = mkPkgs system;
         modules = [
           {
@@ -85,7 +78,6 @@
               username = user;
             };
           }
-          (./users + /home.nix)
           (./users + "/${name}" + /home.nix)
         ];
       };
@@ -113,34 +105,12 @@
       # These are usually stuff you would upstream into home-manager
       homeManagerModules = import ./modules/home-manager;
 
-      ## NixOS configuration entrypoint
-      ## Available through 'nixos-rebuild --flake .#your-hostname'
-      #nixosConfigurations = {
-      #  # FIXME replace with your hostname
-      #  your-hostname = nixpkgs.lib.nixosSystem {
-      #    specialArgs = { inherit inputs outputs; };
-      #    modules = [
-      #      # > Our main nixos configuration file <
-      #      ./nixos/configuration.nix
-      #    ];
-      #  };
-      #};
+      nixosConfigurations."nixos" = setupNixOS "nixos" "x86_64-linux";
 
-      ## Standalone home-manager configuration entrypoint
-      ## Available through 'home-manager --flake .#your-username@your-hostname'
-      #homeConfigurations = {
-      #  # FIXME replace with your username@hostname
-      #  "your-username@your-hostname" = home-manager.lib.homeManagerConfiguration {
-      #    pkgs = nixpkgs.legacyPackages.x86_64-linux; # Home-manager requires 'pkgs' instance
-      #    extraSpecialArgs = { inherit inputs outputs; };
-      #    modules = [
-      #      # > Our main home-manager configuration file <
-      #      ./home-manager/home.nix
-      #    ];
-      #  };
-      #};
-      nixosConfigurations."nixos" = setUpNixOS "nixos" "x86_64-linux";
-
+      defaultPackage = forAllSystems (system:
+        let pkgs = (mkPkgs system).nix;
+        in pkgs
+      );
 
     };
 }

@@ -1,10 +1,11 @@
-{ inputs, outputs, lib, config, pkgs, vars, systemName, secrets, ... }:
+{ inputs, outputs, lib, config, pkgs, self, vars, systemName, secrets, ... }:
 #{ config, lib, pkgs, nixpkgs, self, inputs, vars, systemName, ... }:
 
 {
   imports = [
-    ../../modules/nixos/nix.nix
-    ../../modules/nixos/sshd.nix
+    #../../modules/nixos/nix.nix
+    #../../modules/nixos/sshd.nix
+    ../modules/nixos
   ];
 
   modules = {
@@ -16,7 +17,7 @@
     tmpOnTmpfs = true;
   };
 
-  time.timeZone = "Europe/Brussels";
+  time.timeZone = secrets.mainTimezone;
   i18n.defaultLocale = "en_US.UTF-8";
 
   networking.firewall.enable = true;

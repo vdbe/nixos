@@ -1,12 +1,11 @@
-{ config, lib, pkgs, inputs, modulesPath, vars, ... }:
+{ config, lib, pkgs, inputs, modulesPath, vars, secrets, systemName, ... }:
 
 {
-  imports =
-    [
-      ../_all/configuration.nix
-      (modulesPath + "/profiles/base.nix")
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    ../../modules/nixos/profiles/vm.nix
+
+    ./hardware-configuration.nix
+  ];
 
   modules = {
     sshd.enable = true;
@@ -25,28 +24,18 @@
     };
 
     users = {
-      user = {
+      user = secrets.users."user@${systemName}" // {
+        #user = secrets.users // {
         isNormalUser = true;
         extraGroups = [ "wheel" ];
-        initialPassword = "toor123";
       };
     };
   };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
-  };
-
-  services.xe-guest-utilities.enable = true;
+  #environment.systemPackages = with pkgs; [
+  #];
 
   home-manager.users.user = ../../users/user/home.nix;
 }
