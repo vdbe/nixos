@@ -14,23 +14,20 @@ in
 
   config = mkIf cfg.enable {
     programs.gpg = {
-        enable = true;
-        mutableKeys = true;
-        mutableTrust = false;
-        publicKeys = [
-          {
-            source = ../../files/pub.key;
-            trust = "ultimate";
-          }
-        ];
+      enable = true;
+      mutableKeys = true;
+      mutableTrust = false;
+      publicKeys = [
+        {
+          source = ../../files/pub.key;
+          trust = "ultimate";
+        }
+      ];
     };
 
     services.gpg-agent = {
       enable = true;
       enableSshSupport = true;
-      extraConfig = ''
-        use-agent
-      '';
     };
   };
 }
