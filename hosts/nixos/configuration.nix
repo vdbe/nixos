@@ -25,12 +25,25 @@
 
     users = {
       user = secrets.users."user@${systemName}" // {
-        #user = secrets.users // {
+        uid = 1000;
         isNormalUser = true;
         extraGroups = [ "wheel" ];
       };
     };
   };
+
+  security.sudo.extraRules = [
+    {
+      users = [ "user" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ]; # "SETENV" # Adding the following could be a good idea
+        }
+      ];
+    }
+  ];
+
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget

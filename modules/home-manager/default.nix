@@ -7,5 +7,6 @@
     ./git.nix
     ./gpg.nix
     ./htop.nix
+    ./starship.nix
   ];
 }

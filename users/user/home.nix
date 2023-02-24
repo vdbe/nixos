@@ -14,6 +14,7 @@ in
     htop.enable = true;
     gpg.enable = true;
     git.enable = true;
+    starship.enable = true;
   };
 
 
