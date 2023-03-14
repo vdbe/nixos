@@ -11,6 +11,7 @@ in
     ../../modules/home-manger/git
     ../../modules/home-manger/bash
     ../../modules/home-manger/exa
+    ../../modules/home-manger/tmux
   ];
 
   modules = {
@@ -19,6 +20,7 @@ in
     starship.enable = true;
     bash.enable = true;
     exa.enable = true;
+    tmux.enable = true;
   };
 
 
